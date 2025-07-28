@@ -1,0 +1,66 @@
+{
+  "name": "Asset Companion",
+  "description": "Handy sidebar for creatives: grab fonts, images & colours from any page.",
+  "version": "1.1.0",
+  "manifest_version": 3,
+
+  "icons": {
+    "16": "icons/asset-companion-16.png",
+    "32": "icons/asset-companion-32.png",
+    "48": "icons/asset-companion-48.png",
+    "128": "icons/asset-companion-128.png"
+  },
+
+  "action": {
+    "default_title": "Open Asset Companion"
+  },
+
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": [
+        "libs/html2canvas.min.js",
+        "libs/jspdf.umd.min.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "permissions": [
+    "storage",
+    "tabs",
+    "downloads",
+    "scripting",
+    "sidePanel"
+  ],
+
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/asset-companion-*.png",
+        "icons/*.png",
+        "libs/*",
+        "assets/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}

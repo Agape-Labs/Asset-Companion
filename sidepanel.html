@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- Strict CSP for MV3 -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+                   img-src     'self' data: blob: https:;
+                   script-src  'self';
+                   font-src    https://fonts.gstatic.com;">
+    <title>Asset Companion</title>
+
+    <!-- Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Main UI skin -->
+    <link rel="stylesheet" href="sidebar.css" />
+  </head>
+
+  <body>
+    <section class="glass panel">
+      <header class="panel-header">
+        <div class="header-left">
+          <img src="icons/asset-companion-32.png" width="24" height="24" alt="">
+          <h1>Asset Companion</h1>
+        </div>
+        <button id="btn-refresh" class="header-refresh-btn" aria-label="Refresh content">
+          <img src="icons/refresh.png" alt="" class="refresh-icon">
+        </button>
+      </header>
+
+      <nav id="toolbox" aria-label="Asset tools">
+        <button id="btn-images" aria-label="Extract images">
+          <img src="icons/get images.png" alt="" class="button-icon">
+          <span>Get Images</span>
+        </button>
+        <button id="btn-fonts" aria-label="Extract fonts">
+          <img src="icons/get fonts.png" alt="" class="button-icon">
+          <span>Get Fonts</span>
+        </button>
+        <button id="btn-colours" aria-label="Extract colours">
+          <img src="icons/get colors.png" alt="" class="button-icon">
+          <span>Get Colors</span>
+        </button>
+        <button id="btn-pick" aria-label="Pick screen colour">
+          <img src="icons/pick color.png" alt="" class="button-icon">
+          <span>Pick Color</span>
+        </button>
+        <button id="btn-shot" aria-label="Capture screenshot">
+          <img src="icons/screenshot.png" alt="" class="button-icon">
+          <span>Screenshot</span>
+        </button>
+        <button id="btn-toggle-rc" aria-label="Toggle right-click lock">
+          <img src="icons/right click.png" alt="" class="button-icon">
+          <span>Right Click<br>Unlock</span>
+        </button>
+      </nav>
+
+      <main id="results" aria-live="polite"></main>
+
+      <!-- Templates -->
+      <template id="result-template">
+        <article class="result-item"></article>
+      </template>
+
+      <template id="image-grid-template">
+        <div class="content-wrapper">
+          <div class="filter-controls">
+            <div class="filter-group">
+              <label>Size:</label>
+              <select id="size-filter">
+                <option value="">All</option>
+                <option value="small">Small (&lt;200px)</option>
+                <option value="medium">Medium (200-800px)</option>
+                <option value="large">Large (&gt;800px)</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Aspect:</label>
+              <select id="aspect-filter">
+                <option value="">All</option>
+                <option value="square">Square</option>
+                <option value="landscape">Landscape</option>
+                <option value="portrait">Portrait</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Type:</label>
+              <select id="type-filter">
+                <option value="">All</option>
+                <option value="png">PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="gif">GIF</option>
+                <option value="svg">SVG</option>
+                <option value="webp">WebP</option>
+              </select>
+            </div>
+            <button id="download-all-btn" class="download-all-btn">
+              <img src="icons/download.png" alt="" class="download-icon">
+              Download All
+            </button>
+          </div>
+          <div class="image-grid" id="image-grid"></div>
+        </div>
+      </template>
+
+      <template id="image-item-template">
+        <div class="image-item">
+          <div class="image-container">
+            <img class="image-thumbnail" alt="Page image" loading="lazy">
+            <div class="image-overlay">
+              <div class="image-info">
+                <span class="image-size"></span>
+                <span class="image-type"></span>
+              </div>
+            </div>
+          </div>
+          <button class="download-btn">
+            <img src="icons/download.png" alt="" class="download-icon">
+            Download
+          </button>
+        </div>
+      </template>
+
+      <template id="font-list-template">
+        <div class="content-wrapper">
+          <div class="font-list" id="font-list"></div>
+        </div>
+      </template>
+
+      <template id="font-item-template">
+        <div class="font-item">
+          <span class="font-name"></span>
+          <span class="copy-hint">Click to copy</span>
+        </div>
+      </template>
+
+      <template id="color-grid-template">
+        <div class="content-wrapper">
+          <div class="color-grid" id="color-grid"></div>
+        </div>
+      </template>
+
+      <template id="color-swatch-template">
+        <div class="color-swatch-item">
+          <div class="color-swatch"></div>
+          <span class="color-hex"></span>
+        </div>
+      </template>
+
+      <template id="picker-grid-template">
+        <div class="content-wrapper">
+          <div class="picker-status">
+            <span id="pick-count">0</span>/20 colors picked
+            <button id="clear-picks">Clear All</button>
+          </div>
+          <div class="color-grid" id="picker-grid"></div>
+          <div class="picker-instructions">Click anywhere on the page to pick colors</div>
+        </div>
+      </template>
+
+      <template id="screenshot-options-template">
+        <div class="content-wrapper">
+          <div class="screenshot-options">
+            <button id="save-png" class="screenshot-btn">
+              <img src="icons/download.png" alt="" class="download-icon">
+              Save as PNG
+            </button>
+            <button id="save-pdf" class="screenshot-btn">
+              <img src="icons/download.png" alt="" class="download-icon">
+              Save as PDF
+            </button>
+          </div>
+          <div class="screenshot-status" id="screenshot-status">Click an option above to capture screenshot</div>
+        </div>
+      </template>
+
+      <footer class="panel-footer">
+        <img src="assets/agape-logo.png" alt="Agape Labs logo" width="20" height="20" class="brand-logo">
+        <span>&copy; <span id="current-year">2025</span> Agape Labs</span>
+      </footer>
+    </section>
+
+    <script src="sidebar.js" type="module"></script>
+  </body>
+</html>

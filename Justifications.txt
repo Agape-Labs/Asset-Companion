@@ -1,0 +1,35 @@
+Single Purpose Justification
+Asset Companion is a creative productivity extension that enables users to easily extract design assets—including images, fonts, and colors—from any website they visit. It provides an intuitive sidebar interface to organize, preview, filter, and quickly download these assets for design and inspiration purposes. All features are focused on enabling rapid asset discovery and export for designers and developers.
+
+Permission Justifications
+storage
+We use the "storage" permission to persist user preferences and session data (such as user-selected filters or UI state) locally within the extension, enabling a consistent and reliable user experience across sessions.
+
+tabs
+"tabs" is required to identify the currently active tab, to communicate with content scripts injected into that tab, and to extract the main domain for folder-based downloads. This ensures assets are always taken from the correct user-chosen web page.
+
+downloads
+"downloads" allows the extension to save images and screenshots directly to the user’s disk. It is essential for batch features (like downloading all extracted images into a domain-named folder) and for single asset downloads. We do not use this API for any purpose other than user-initiated downloads.
+
+scripting
+The "scripting" permission allows us to inject our content scripts (for detecting and extracting assets) into user-visible web pages dynamically, especially if the extension is activated after the tab loads. No scripts are executed on websites except our own (contained in the extension package).
+
+sidePanel
+The "sidePanel" permission is necessary to display the extension's custom sidebar UI as a persistent, resizable panel alongside any website, so users can interact with extracted assets while they browse.
+
+host_permissions
+We request "http://*/*" and "https://*/*" host permissions solely to inject content scripts and to access images for extraction and download from any site the user chooses. No bulk data is read or sent; the content scripts operate only when users use the extension’s sidebar.
+
+Are you using remote code?
+No, the extension does NOT use remote code.
+
+All executable code (JavaScript, HTML, CSS, and included libraries) is packaged within the extension uploaded to the Chrome Web Store.
+There is no code, script, or resource loaded or injected from an external server.
+All processing and logic run locally in the user's browser environment.
+No “eval” or dynamic script fetching is performed.
+
+If ever asked in the future:
+If a CDN library is included in web_accessible_resources (e.g. Google Fonts for CSS only), it is limited to fonts or CSS and NOT for any remote JavaScript execution.
+
+Summary:
+All permissions are used strictly for the direct, user-initiated asset extraction and download features described. No remote or third-party code is ever executed, and user privacy is fully respected.
